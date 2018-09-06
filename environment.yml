@@ -42,5 +42,6 @@ dependencies:
   - zlib=1.2.11=hf3cbc9b_2
   - pip:
     - numpy-quaternion==2018.6.18.16.33.12
+    - mplleaflet==0.0.5
 prefix: /anaconda3/envs/pyvertigo
 

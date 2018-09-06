@@ -27,7 +27,7 @@ class FileParser:
     def fixRolloverError(dataFrame):
         rollover_value = 2.0**32/1e4
         delta_times = dataFrame.diff()[dataFrame.columns[0]]
-        negative_delta_times = delta_times.loc[delta_times < 0]
+        negative_delta_times = delta_times.loc[delta_times < -10000]
         times = dataFrame[dataFrame.columns[0]]
         for row in negative_delta_times.index:
             times[row:len(times.index)] += rollover_value
