@@ -34,7 +34,7 @@ class RollPitchYaw(object):
         return eul
     
     @staticmethod
-    def transform(vector: np.array, quatdata: np.array) -> np.array:
+    def transform(vector, quatdata) -> np.array:
         """
         Convert vectors in board frame into the world fram by using
         the IMU's quaternion vector in the world frame.
@@ -42,7 +42,7 @@ class RollPitchYaw(object):
         :param np.array quatdata: The quaternion data
         :returns np.array: The vector converted into world frame
         """
-        quat = np.quaternion(quatdata[0],quatdata[1],quatdata[2],quatdata[3])
+        quat = quaternion.as_quat_array(quatdata)
         return quaternion.rotate_vectors(quat, vector)
         
 
