@@ -34,7 +34,7 @@ class RollPitchYaw(object):
         return eul
     
     @staticmethod
-    def transform(vector, quatdata) -> np.array:
+    def transform(vectors, quatdata) -> np.array:
         """
         Convert vectors in board frame into the world fram by using
         the IMU's quaternion vector in the world frame.
@@ -42,8 +42,27 @@ class RollPitchYaw(object):
         :param np.array quatdata: The quaternion data
         :returns np.array: The vector converted into world frame
         """
-        quat = quaternion.as_quat_array(quatdata)
-        return quaternion.rotate_vectors(quat, vector)
+        rotated_vectors = vectors.copy()
+        for i in range(len(quatdata)):
+            rotated_vector = np.array([0.0,rotated_vectors[i][0],rotated_vectors[i][1],rotated_vectors[i][2]])
+            rotated_vector = RollPitchYaw.hamiltonian(quatdata[i],rotated_vector)
+            rotated_vector = RollPitchYaw.hamiltonian(rotated_vector,RollPitchYaw.quaternionConjugate(quatdata[i]))
+            rotated_vector = np.array([rotated_vector[1],rotated_vector[2],rotated_vector[3]])
+            rotated_vectors[i] = rotated_vector
+        return rotated_vectors
+    
+    @staticmethod
+    def quaternionConjugate(quat: np.array) -> np.array:
+        return np.array([quat[0],-quat[1],-quat[2],-quat[3]])
+    
+    @staticmethod
+    def hamiltonian(q: np.array, r: np.array) -> np.array:
+        return np.array([
+            q[0]*r[0] - q[1]*r[1] - q[2]*r[2] - q[3]*r[3],
+            q[0]*r[1] + r[0]*q[1] + q[2]*r[3] - q[3]*r[2],
+            q[0]*r[2] + r[0]*q[2] + q[3]*r[1] - q[1]*r[3],
+            q[0]*r[3] + r[0]*q[3] + q[1]*r[2] - q[2]*r[1]
+        ])
         
 
     @staticmethod
