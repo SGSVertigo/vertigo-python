@@ -98,27 +98,28 @@ class Kalman3d:
         )
 
         # Remove gravity from NED accel, leaving linear accels in NED frame
-        an = an - 1
+        self.an = self.an - 1
         # Convert to ms^-2
-        an = an * 9.81
-        ae = ae * 9.81
-        ad = ad * 9.81
-
-        sensors = np.stack(self.northings, self.eastings, self.alt_relative, an, ae, ad)
-
-        kal_x_stor = np.zero(9, n_steps)
+        self.an = self.an * 9.81
+        self.ae = self.ae * 9.81
+        self.ad = self.ad * 9.81
+        sensors = np.stack((self.northings, self.eastings, self.alt_relative, self.an, self.ae, self.ad))
+        kal_x_stor = np.zeros((9, n_steps))
 
         for i in range(0, n_steps - 1):
             # Predict
-            xp = F * x  # no inputs
-            Pp = F * P * np.conj(F) + Q
-
+            xp = F @ x  # no inputs
+            Pp = F @ P @ F.T + Q
             # Update
-            y = sensors(i) - H * x
-            S = H * P * np.conj(H) + R
-            K = Pp * np.conj(H) * np.linalg.inv(S)
-            x = xp + K * y
-            P = (np.identity(9) - K * H) * Pp
-
+            sensor_step = np.array([sensors[:,i]]).T # Not sure about this. Ask Jon
+            y = sensor_step - H @ x
+            S = H @ P @ H.T + R
+            K = Pp @ H.T @ np.linalg.inv(S)
+            x = xp + K @ y
+            P = (np.identity(9) - K @ H) @ Pp
             # Store
-            kal_x_stor[:, i] = x
+            kal_x_stor[:, i] = x[:,0]
+        self.kal_x_store = kal_x_stor
+
+    def result(self):
+        return self.kal_x_store
