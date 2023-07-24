@@ -45,7 +45,7 @@ class Kalman3d:
             self.gpstime, self.northings, kind="previous", fill_value="extrapolate"
         )(self.imutime)
         self.alt_relative = interpolate.interp1d(
-            self.gpstime, self.alt_relative, fill_value="extrapolate"
+            self.gpstime, self.alt_relative, fill_value="extrapolate",
         )(self.imutime)
         self.eastings = np.nan_to_num(self.eastings, nan=0)
         self.northings = np.nan_to_num(self.northings, nan=0)
