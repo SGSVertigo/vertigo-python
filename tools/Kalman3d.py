@@ -29,10 +29,12 @@ class Kalman3d:
         eastings = np.array(eastings)
         northings = np.array(northings)
         self.alt_relative = (
-            -(altitudes - altitudes[0]) * -1.0
+            (altitudes - altitudes[0]) * -1.0
         )  # convert to relative, down is positive
+        
         self.eastings = eastings - eastings[0]  # convert to relative
         self.northings = northings - northings[0]  # convert to relative
+    
 
     """Interpolate the GPS to the same timescales as the imu data"""
 
@@ -98,7 +100,7 @@ class Kalman3d:
         )
 
         # Remove gravity from NED accel, leaving linear accels in NED frame
-        self.an = self.an - 1
+        self.ad = self.ad - 1
         # Convert to ms^-2
         self.an = self.an * 9.81
         self.ae = self.ae * 9.81
