@@ -1,0 +1,8 @@
+pandas
+numpy-quaternion
+numpy
+matplotlib
+mplleaflet
+scipy
+utm
+jupyterlab
