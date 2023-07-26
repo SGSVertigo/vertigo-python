@@ -21,17 +21,19 @@ class Kalman3d:
         self.alt = np.array(alt)
         self.eastings = []
         self.northings = []
+        self.datum = ()
         self.alt_relative = []
 
     def llm2utm(self):
-        (eastings, northings, _, _) = utm.from_latlon(self.lat, self.lon)
+        self.datum = utm.from_latlon(self.lat, self.lon)
         altitudes = np.array(self.alt)
-        eastings = np.array(eastings)
-        northings = np.array(northings)
+        eastings = np.array(self.datum[0])
+        northings = np.array(self.datum[1])
         self.alt_relative = (
             altitudes - altitudes[0]
         ) * -1.0  # convert to relative, down is positive
-
+        self.easting_datum = eastings[0]
+        self.northing_datum = northings[0]
         self.eastings = eastings - eastings[0]  # convert to relative
         self.northings = northings - northings[0]  # convert to relative
 
@@ -70,7 +72,7 @@ class Kalman3d:
         # Process noise
         Q = np.diag([1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-3, 1e-3, 1e-3])
         # Measurement noise
-        gps_var = 1e-6
+        gps_var = 1e-5
         imu_var = 1e-3
         #Error definitions
         R = np.diag([gps_var, gps_var, gps_var * 10, imu_var, imu_var, imu_var])
